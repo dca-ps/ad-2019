@@ -1,4 +1,3 @@
-import math
 import numpy
 
 
@@ -49,17 +48,85 @@ def littleLaw(lmbd, mu):
 
 
 def confidenceInterval(standardDeviation,sampleMean,sampleSize):
-    return Interval(sampleMean - 1.96*(standardDeviation/math.sqrt(sampleSize)), sampleMean + 1.96*(standardDeviation/math.sqrt(sampleSize)))
+    return Interval(sampleMean - 1.96*(standardDeviation/numpy.sqrt(sampleSize)), sampleMean + 1.96*(standardDeviation/numpy.sqrt(sampleSize)))
 
-def runQueue(step):
-    print("{0:.5f}".format(step))
+def runQueue(lmbd, mu, simulationTotalRounds, simulationTotalTime):
+    meanPersonsOnSystem = 0
+    meanPersonsPerRound = []
+
+    for roundsCounter in range(1, simulationTotalRounds):
+    
+        simulationTime = 0
+        simulationQueue = Queue()
+        personsCounter = 0
+        personsServed = 0
+        lastEventTime = 0
+        areaUnderPersonsChart = 0
+        arrivalTime = numpy.random.exponential()
+        serviceEndTime = simulationTotalTime
+
+        arrivalTime = numpy.random.exponential()
+        simulationQueue.push(Event("Arrival",arrivalTime))
+
+        while simulationTime <= simulationTotalTime and (not simulationQueue.emptyQueue()):
+            event = simulationQueue.pop()
+
+            if event.eventType is 'Arrival':
+                simulationTime = arrivalTime
+                areaUnderPersonsChart += personsCounter * (simulationTime - lastEventTime)
+                personsCounter += 1
+                lastEventTime = simulationTime
+                arrivalTime = simulationTime + numpy.random.exponential()
+                simulationQueue.push(Event("Arrival", arrivalTime))
+
+                if personsCounter == 1:
+                    serviceEndTime = simulationTime + numpy.random.exponential()
+                    simulationQueue.push(Event("Departure", serviceEndTime))
+                
+            elif event.eventType is 'Departure':
+                simulationTime = serviceEndTime
+                areaUnderPersonsChart += personsCounter * (simulationTime - lastEventTime)
+                personsCounter -= 1
+                lastEventTime = simulationTime
+                personsServed += 1
+
+                if personsCounter > 0:
+                    serviceEndTime = simulationTime + numpy.random.exponential()
+                    simulationQueue.push(Event("Departure", serviceEndTime))
+        meanPersonsPerRound.append(areaUnderPersonsChart/simulationTotalTime)
+
+
+    for i in range(0, len(meanPersonsPerRound)):
+        meanPersonsOnSystem += (meanPersonsPerRound[i])/simulationTotalRounds
+    analyticUtilisation = lmbd/mu
+    personsOnSystemVariance = 0
+    for i in range(0, len(meanPersonsPerRound)):
+        personsOnSystemVariance += numpy.power(meanPersonsPerRound[i]-meanPersonsOnSystem,2)/numpy.maximum(len(meanPersonsPerRound)-1,1)
+
+    personsOnSystemStandardDeviation = numpy.sqrt(personsOnSystemVariance)
+
+    confidenceIntervalEndPoints = confidenceInterval(personsOnSystemStandardDeviation,meanPersonsOnSystem,len(meanPersonsPerRound))
+
+    analyticMeanPersonsOnSystem = littleLaw(lmbd,mu)
+
+    print("Lambda " + str(lmbd))
+    print("Mu " + str(mu))
+    print("Pessoas Servidas " + str(personsServed))
+    print("Pessoas médias analíticas no sistema " + str(analyticMeanPersonsOnSystem))
+    print("Média de pessoas no sistema " + str(meanPersonsOnSystem))
+    print("Intervalo de confiança " + str(confidenceIntervalEndPoints))
+    print("Utilização analítica " + str(analyticUtilisation))
+    print("Pessoas no desvio padrão do sistema " + str(personsOnSystemStandardDeviation))
+            
+    
+
 
 def simulate(lmbd, mu):
     for step in numpy.arange(lmbd, 0.9, 0.05):
-        runQueue(step)
+        runQueue(step, mu, 10000, 100)
 
 
 
 
 
-simulate(0.1, 2)
+simulate(.12, .13)
