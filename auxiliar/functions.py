@@ -1,4 +1,4 @@
-import numpy, random, math
+import numpy, random
 from entities.interval import Interval
 
 SEED_FILENAME = 'seed'
@@ -22,7 +22,7 @@ def create_random_generator():
 
     def exponencial(lambd):
         x = generator.random()
-        ret = - math.log(1.0 - x) / lambd
+        ret = - numpy.log(1.0 - x) / lambd
         return ret
 
     generator.exponential = exponencial

@@ -1,4 +1,4 @@
-import numpy, math
+import numpy
 import auxiliar.functions as aux
 from entities.queue import Queue
 from entities.event import Event
@@ -56,16 +56,17 @@ def run_queue(lambd, mi, simulation_total_rounds, simulation_total_time):
 
 
     for i in range(0, len(mean_persons_per_round)):
-        mean_persons_on_system += (mean_persons_per_round[i]) / simulation_total_rounds
+        mean_persons_on_system += (mean_persons_per_round[i]) 
+    mean_persons_on_system /= simulation_total_rounds
 
     analytic_utilisation = lambd / mi
     persons_on_system_variance = 0
 
     for i in range(0, len(mean_persons_per_round)):
         persons_on_system_variance += \
-            math.pow(mean_persons_per_round[i] - mean_persons_on_system, 2) / max( len(mean_persons_per_round) - 1, 1)
+            numpy.power(mean_persons_per_round[i] - mean_persons_on_system, 2) / numpy.maximum( len(mean_persons_per_round) - 1, 1)
 
-    persons_on_system_standard_deviation = math.sqrt(persons_on_system_variance)
+    persons_on_system_standard_deviation = numpy.sqrt(persons_on_system_variance)
 
     confidence_interval_end_points = \
         aux.confidence_interval(
@@ -88,7 +89,7 @@ def run_queue(lambd, mi, simulation_total_rounds, simulation_total_time):
 
 lambdas = (round(n, 2) for n in numpy.arange(.05, .91, .05)) # 0.05, 0.1, 0.15, . . . , 0.9
 mi = .4
-n_rodadas = 2
+n_rodadas = 10
 total_time = 100000
 
 def simulate(mu):
