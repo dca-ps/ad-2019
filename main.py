@@ -26,7 +26,7 @@ def run_queue(lmbd, mi, simulation_total_rounds, simulation_total_time):
         while simulation_time <= simulation_total_time and (not simulation_queue.emptyQueue()):
             event = simulation_queue.pop()
 
-            if event.eventType is TipoEvento.Arrival:
+            if event.event_type is TipoEvento.Arrival:
                 simulation_time = arrival_time
                 area_under_persons_chart += persons_counter * (simulation_time - last_event_time)
                 persons_counter += 1
@@ -38,7 +38,7 @@ def run_queue(lmbd, mi, simulation_total_rounds, simulation_total_time):
                     service_end_time = simulation_time + numpy.random.exponential()
                     simulation_queue.push( Event(TipoEvento.Departure, service_end_time) )
                 
-            elif event.eventType is TipoEvento.Departure:
+            elif event.event_type is TipoEvento.Departure:
                 simulation_time = service_end_time
                 area_under_persons_chart += persons_counter * (simulation_time - last_event_time)
                 persons_counter -= 1
@@ -56,13 +56,13 @@ def run_queue(lmbd, mi, simulation_total_rounds, simulation_total_time):
         mean_persons_on_system += (mean_persons_per_round[i]) / simulation_total_rounds
 
     analytic_utilisation = lmbd / mi
-    personsOnSystemVariance = 0
+    persons_on_system_variance = 0
 
     for i in range(0, len(mean_persons_per_round)):
-        personsOnSystemVariance += \
+        persons_on_system_variance += \
             numpy.power(mean_persons_per_round[i] - mean_persons_on_system, 2) / numpy.maximum( len(mean_persons_per_round) - 1, 1)
 
-    persons_on_system_standard_deviation = numpy.sqrt(personsOnSystemVariance)
+    persons_on_system_standard_deviation = numpy.sqrt(persons_on_system_variance)
 
     confidence_interval_end_points = \
         aux.confidence_interval(

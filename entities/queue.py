@@ -9,7 +9,7 @@ class Queue:
         return string
 
     def sortEvents(self, event):
-        return event.eventStartTime
+        return event.event_start_time
 
     def push(self, element):
         self.array.append(element)
