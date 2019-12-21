@@ -88,10 +88,12 @@ def run_queue(lambd, mi, simulation_total_rounds, simulation_total_time):
 
 lambdas = (round(n, 2) for n in numpy.arange(.05, .91, .05)) # 0.05, 0.1, 0.15, . . . , 0.9
 mi = .4
+n_rodadas = 2
+total_time = 100000
 
 def simulate(mu):
     for lambd in lambdas:
-        run_queue(lambd, mu, 2, 100000)
+        run_queue(lambd, mu, n_rodadas, total_time)
 
 
 simulate(mi)
