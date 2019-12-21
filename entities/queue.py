@@ -8,15 +8,12 @@ class Queue:
             string += str(element) + ' '
         return string
 
-    def sortEvents(self, event):
-        return event.event_start_time
-
     def push(self, element):
         self.array.append(element)
-        self.array.sort(key=self.sortEvents)
+        self.array.sort(key = lambda e : e.event_start_time, reverse = True)
 
     def pop(self):
         return self.array.pop()
 
-    def emptyQueue(self):
-        return not self.array
+    def is_queue_empty(self):
+        return len(self.array) == 0

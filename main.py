@@ -1,29 +1,32 @@
-import numpy
+import numpy, math
 import auxiliar.functions as aux
 from entities.queue import Queue
 from entities.event import Event
 from enums.tipo_evento import TipoEvento
 
 
-def run_queue(lmbd, mi, simulation_total_rounds, simulation_total_time):
+# recuperando a ultima semente utilizada pelo gerador de numeros aleatorios (se existir)
+random_generator = aux.create_random_generator()
+
+def run_queue(lambd, mi, simulation_total_rounds, simulation_total_time):
+
     mean_persons_on_system = 0
     mean_persons_per_round = []
 
-    for rounds_counter in range(1, simulation_total_rounds):
-    
+    for _ in range(1, simulation_total_rounds):
+
         simulation_time = 0
         simulation_queue = Queue()
         persons_counter = 0
-        persons_served = 0
+        served_persons = 0
         last_event_time = 0
         area_under_persons_chart = 0
-        arrival_time = numpy.random.exponential()
+        arrival_time = random_generator.exponential(lambd)
         service_end_time = simulation_total_time
 
-        arrival_time = numpy.random.exponential()
         simulation_queue.push(Event(TipoEvento.Arrival, arrival_time))
 
-        while simulation_time <= simulation_total_time and (not simulation_queue.emptyQueue()):
+        while simulation_time <= simulation_total_time and (not simulation_queue.is_queue_empty()):
             event = simulation_queue.pop()
 
             if event.event_type is TipoEvento.Arrival:
@@ -31,22 +34,22 @@ def run_queue(lmbd, mi, simulation_total_rounds, simulation_total_time):
                 area_under_persons_chart += persons_counter * (simulation_time - last_event_time)
                 persons_counter += 1
                 last_event_time = simulation_time
-                arrival_time = simulation_time + numpy.random.exponential()
+                arrival_time = simulation_time + random_generator.exponential(lambd)
                 simulation_queue.push(Event(TipoEvento.Arrival, arrival_time))
 
                 if persons_counter == 1:
-                    service_end_time = simulation_time + numpy.random.exponential()
+                    service_end_time = simulation_time + random_generator.exponential(mi)
                     simulation_queue.push( Event(TipoEvento.Departure, service_end_time) )
-                
+
             elif event.event_type is TipoEvento.Departure:
                 simulation_time = service_end_time
                 area_under_persons_chart += persons_counter * (simulation_time - last_event_time)
                 persons_counter -= 1
                 last_event_time = simulation_time
-                persons_served += 1
+                served_persons += 1
 
                 if persons_counter > 0:
-                    service_end_time = simulation_time + numpy.random.exponential()
+                    service_end_time = simulation_time + random_generator.exponential(mi)
                     simulation_queue.push( Event(TipoEvento.Departure, service_end_time) )
 
         mean_persons_per_round.append(area_under_persons_chart / simulation_total_time)
@@ -55,14 +58,14 @@ def run_queue(lmbd, mi, simulation_total_rounds, simulation_total_time):
     for i in range(0, len(mean_persons_per_round)):
         mean_persons_on_system += (mean_persons_per_round[i]) / simulation_total_rounds
 
-    analytic_utilisation = lmbd / mi
+    analytic_utilisation = lambd / mi
     persons_on_system_variance = 0
 
     for i in range(0, len(mean_persons_per_round)):
         persons_on_system_variance += \
-            numpy.power(mean_persons_per_round[i] - mean_persons_on_system, 2) / numpy.maximum( len(mean_persons_per_round) - 1, 1)
+            math.pow(mean_persons_per_round[i] - mean_persons_on_system, 2) / max( len(mean_persons_per_round) - 1, 1)
 
-    persons_on_system_standard_deviation = numpy.sqrt(persons_on_system_variance)
+    persons_on_system_standard_deviation = math.sqrt(persons_on_system_variance)
 
     confidence_interval_end_points = \
         aux.confidence_interval(
@@ -71,26 +74,27 @@ def run_queue(lmbd, mi, simulation_total_rounds, simulation_total_time):
             len(mean_persons_per_round)
         )
 
-    analytic_mean_persons_on_system = aux.little_law(lmbd, mi)
+    analytic_mean_persons_on_system = aux.little_law(lambd, mi)
 
-    print("Lambda " + str(lmbd))
+    print("Lambda " + str(lambd))
     print("Mi " + str(mi))
-    print("Pessoas Servidas " + str(persons_served))
+    print("Pessoas Servidas " + str(served_persons))
     print("Pessoas médias analíticas no sistema " + str(analytic_mean_persons_on_system))
     print("Média de pessoas no sistema " + str(mean_persons_on_system))
     print("Intervalo de confiança " + str(confidence_interval_end_points))
     print("Utilização analítica " + str(analytic_utilisation))
-    print("Pessoas no desvio padrão do sistema " + str(persons_on_system_standard_deviation))
-            
-    
+    print("Pessoas no desvio padrão do sistema " + str(persons_on_system_standard_deviation) + "\n")
 
 
-def simulate(lmbd, mu):
-    for step in numpy.arange(lmbd, 0.9, 0.05):
-        run_queue(step, mu, 10000, 100)
+lambdas = (round(n, 2) for n in numpy.arange(.05, .91, .05)) # 0.05, 0.1, 0.15, . . . , 0.9
+mi = .4
+
+def simulate(mu):
+    for lambd in lambdas:
+        run_queue(lambd, mu, 2, 100000)
 
 
+simulate(mi)
 
 
-
-simulate(.12, .13)
+aux.save_generator_state(random_generator)
