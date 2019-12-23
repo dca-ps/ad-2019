@@ -78,7 +78,11 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simula
                 #Caso já haja um evento sendo servido ele deve ser mantido em uma fila. Pois ele chegou mas não sera atendido no momento
                 #Precisamos saber de que tipo ele é tambem
                 else:
-                    waiting_queue.push(event)
+                    #Este push tem que ordenar por prioridade de atendimento, pois estamos falando da fila de atendimento.
+                    #**********************************************************************
+                    #IMPORTANTE: Caso não haja prioridade, basta trocar por um push normal!
+                    #**********************************************************************
+                    waiting_queue.push_queue(event)
                     
             #Caso seja uma saida
             elif event.event_type is TipoEvento.Departure:
@@ -94,6 +98,7 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simula
                 #Verifica se há alguem na fila
                 if persons_counter > 0:
                     #Pegamos o evento que chegou e esta aguardando e criamos seu evento de saida (Fila)
+                    #Esta fila já esta ordenada para prioridade, se houver
                     event = waiting_queue.pop()
                     if event.event_class is 1:
                         service_end_time = simulation_time + random_generator.exponential(mi1)

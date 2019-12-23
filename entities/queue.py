@@ -8,9 +8,21 @@ class Queue:
             string += str(element) + ' '
         return string
 
+    #IMPORTANTE!!!!!!
+    #A chegada não tem prioridade, o que tem prioridade é a fila, por isso aqui não tem sort do tipo de evento.
+    #Uma pessoa que não chegou ainda não tem prioridade sobre quem esta em atendimento.
     def push(self, element):
         self.array.append(element)
+        self.array = sorted(self.array, key = lambda e :  e.event_start_time, reverse = True)
+        #print("Fila de eventos futuros ")
+        #print(*self.array)
+        #print('\n*********************************************************\n')
+        
+    #Push com organização por prioridade.
+    def push_queue(self, element):
+        self.array.append(element)
         self.array = sorted(self.array, key = lambda e : (e.event_class, e.event_start_time,), reverse = True)
+        print("Fila de pessoas aguardando ")
         print(*self.array)
         print('\n*********************************************************\n')
 
