@@ -235,6 +235,7 @@ def exit_time_calculation(event, mi, simulation_time, type):
 
 lambdas1 = (round(n, 2) for n in numpy.arange(.05, .91, .05)) # 0.05, 0.1, 0.15, . . . , 0.9
 lambdas2 = (round(n, 2) for n in numpy.arange(.05, .61, .05)) # 0.05, 0.1, 0.15, . . . , 0.6
+lambdas3 = (round(n, 2) for n in numpy.arange(.05, .61, .05)) # 0.05, 0.1, 0.15, . . . , 0.6
 mi = 1
 n_rodadas = 10
 total_time = 10000
@@ -270,7 +271,7 @@ def inicialization():
         print("Inicializando cenario 1")
         mu1 = 1
         mu2 = 0
-        #simulate(mu1, mu2,lambdas1,0,False,False, "exp")
+        simulate(mu1, mu2,lambdas1,0,False,False, "exp")
         print("Inicializando cenario 2")
         mu1 = 1
         mu2 = 0.5
@@ -278,7 +279,7 @@ def inicialization():
         print("Inicializando cenario 3")
         mu1 = 1
         mu2 = 0.5
-        simulate(mu1, mu2,lambdas2,0.2,False,False, "med")
+        simulate(mu1, mu2,lambdas3,0.2,False,False, "med")
         print("Inicializando cenario 4")
         #TODO: CORRIGIR AS METRICAS DESTE CENARIO
         mu1 = 1
