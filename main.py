@@ -269,7 +269,7 @@ def inicialization():
     print("***********************************************\n")
     chooseed = input("Escolha uma opção:")
     if(chooseed == "1"):
-        print("Inicializando a simulacao para o exercicio 1, parte 1")
+        print("Inicializando a simulacao para o exercicio 3, parte 1")
         print("Inicializando cenario 1")
         mu1 = 1
         mu2 = 0
@@ -288,23 +288,64 @@ def inicialization():
         mu2 = 0.5
         simulate(mu1, mu2,[0.08],0.2,False,False,"unif")
     if(chooseed == "2"):
-        print("TODO 2")
-        #print("Inicializando a simulacao para o exercicio 1, parte 1")
-        #mu1 = 1
-        #mu2 = 0.5
-        #simulate(mu1, mu2,lambdas1,0,False,False)
+        #TODO:Mudar a exibição dos gráficos!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        print("Inicializando a simulacao para o exercicio 3, parte 2")
+        print("Neste caso há uma mudança no grafico gerado em comparação com a opção 1")
+        print("Inicializando cenario 1")
+        mu1 = 1
+        mu2 = 0
+        simulate(mu1, mu2,lambdas1,0,False,False, "exp")
+        print("Inicializando cenario 2")
+        mu1 = 1
+        mu2 = 0.5
+        simulate(mu1, mu2,lambdas2,0.2,False,False, "exp")
+        print("Inicializando cenario 3")
+        mu1 = 1
+        mu2 = 0.5
+        simulate(mu1, mu2,lambdas3,0.2,False,False, "med")
+        print("Inicializando cenario 4")
+        #TODO: CORRIGIR AS METRICAS DESTE CENARIO
+        mu1 = 1
+        mu2 = 0.5
+        simulate(mu1, mu2,[0.08],0.2,False,False,"unif")
     if(chooseed == "3"):
-        print("TODO 3")
-        #print("Inicializando a simulacao para o exercicio 1, parte 1")
-        #mu1 = 1
-        #mu2 = 0.5
-        #simulate(mu1, mu2,lambdas1,0,False,False)
+        print("Inicializando a simulacao para o exercicio 4, parte 1")
+        print("Inicializando cenario 1")
+        mu1 = 1
+        mu2 = 0
+        simulate(mu1, mu2,lambdas1,0,False,False, "exp")
+        print("Inicializando cenario 2")
+        mu1 = 1
+        mu2 = 0.5
+        simulate(mu1, mu2,lambdas2,0.2,True,False, "exp")
+        print("Inicializando cenario 3")
+        mu1 = 1
+        mu2 = 0.5
+        simulate(mu1, mu2,lambdas3,0.2,True,False, "med")
+        print("Inicializando cenario 4")
+        #TODO: CORRIGIR AS METRICAS DESTE CENARIO
+        mu1 = 1
+        mu2 = 0.5
+        simulate(mu1, mu2,[0.08],0.2,True,False,"unif")
     if(chooseed == "4"):
-        print("TODO 4")
-        #print("Inicializando a simulacao para o exercicio 1, parte 1")
-        #mu1 = 1
-        #mu2 = 0
-        #simulate(mu1, mu2,lambdas1,0,False,False)
+        print("Inicializando a simulacao para o exercicio 4, parte 2")
+        print("Inicializando cenario 1")
+        mu1 = 1
+        mu2 = 0
+        simulate(mu1, mu2,lambdas1,0,False,False, "exp")
+        print("Inicializando cenario 2")
+        mu1 = 1
+        mu2 = 0.5
+        simulate(mu1, mu2,lambdas2,0.2,True,False, "exp")
+        print("Inicializando cenario 3")
+        mu1 = 1
+        mu2 = 0.5
+        simulate(mu1, mu2,lambdas3,0.2,True,False, "med")
+        print("Inicializando cenario 4")
+        #TODO: CORRIGIR AS METRICAS DESTE CENARIO
+        mu1 = 1
+        mu2 = 0.5
+        simulate(mu1, mu2,[0.08],0.2,True,False,"unif")
         
     
     
