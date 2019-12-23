@@ -20,7 +20,7 @@ def client_type(lambda1, lambda2):
     else:
         return 2
 
-def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simulation_total_time):
+def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simulation_total_time, priority, preempcao):
 
     mean_persons_on_system = 0
     mean_persons_per_round = []
@@ -80,9 +80,9 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simula
                 else:
                     #Este push tem que ordenar por prioridade de atendimento, pois estamos falando da fila de atendimento.
                     #**********************************************************************
-                    #IMPORTANTE: Caso não haja prioridade, basta trocar por um push normal!
+                    #IMPORTANTE: Caso não haja prioridade, basta trocar por um push normal! (Implementado!)
                     #**********************************************************************
-                    waiting_queue.push_queue(event)
+                    waiting_queue.push_queue(event) if priority is True else waiting_queue.push(event)
                     
             #Caso seja uma saida
             elif event.event_type is TipoEvento.Departure:
@@ -114,6 +114,7 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simula
         mean_persons_on_system += (mean_persons_per_round[i]) 
     mean_persons_on_system /= simulation_total_rounds
 
+    #TODO: AJUSTAR AS METRICAS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     analytic_utilisation = lambd1 / mi
     persons_on_system_variance = 0
 
@@ -195,7 +196,7 @@ def run_queue(lambd, mi, simulation_total_rounds, simulation_total_time):
         mean_persons_on_system += (mean_persons_per_round[i]) 
     mean_persons_on_system /= simulation_total_rounds
 
-    analytic_utilisation = lambd / mi
+    analytic_utilisation = lambd1 / mi
     persons_on_system_variance = 0
 
     for i in range(0, len(mean_persons_per_round)):
@@ -223,17 +224,81 @@ def run_queue(lambd, mi, simulation_total_rounds, simulation_total_time):
     print("Pessoas no desvio padrão do sistema " + str(persons_on_system_standard_deviation) + "\n")
 
 
-lambdas = (round(n, 2) for n in numpy.arange(.05, .91, .05)) # 0.05, 0.1, 0.15, . . . , 0.9
-mi = .4
+lambdas1 = (round(n, 2) for n in numpy.arange(.05, .91, .05)) # 0.05, 0.1, 0.15, . . . , 0.9
+lambdas2 = (round(n, 2) for n in numpy.arange(.05, .61, .05)) # 0.05, 0.1, 0.15, . . . , 0.6
+mi = 1
 n_rodadas = 10
-total_time = 100000
+total_time = 10000
 
-def simulate(mu):
-    for lambd in lambdas:
-        run_queue_parallel(lambd, lambd, mu, mu, n_rodadas, total_time)
+def simulate(mu1, mu2, lambdas1, lambda2, priority, preempecao):
+    for lambd in lambdas1:
+        run_queue_parallel(lambd, lambda2, mu1, mu2, n_rodadas, total_time, priority, preempecao)
 
 
-simulate(mi)
+def inicialization():
+    print("************************************************\n")
+    print("             SIMULADOR AD 2019.2\n")
+    print("     UNIVERDIDADE FEDERAL DO RIO DE JANEIRO\n")
+    print("           PROFESSOR DANIEL SADOC\n")
+    print("************************************************\n")
+    print("************************************************\n")
+    print("          AUTORES EM ORDEM ALFABETICA\n")
+    print("               ANDRE TARDELLI\n")
+    print("                DANIEL AMARAL\n")
+    print("               DANIEL CARDOSO\n")
+    print("               GABRIEL BARBOSA\n")
+    print("************************************************\n")
+    print("Escolha o cenario de simulacao:\n")
+    print("1-Exercicio 3 parte 1\n")
+    print("2-Exercicio 3 parte 2 (Mudanca no grafico gerado)\n")
+    print("3-Exercicio 4 parte 1 Prioridade sem preempção\n")
+    print("4-Exercicio 4 parte 2 Prioridade sem preempção (Mudanca no grafico gerado)\n")
+    print("Restante do trabalho em desenvolvimento")
+    print("***********************************************\n")
+    chooseed = input("Escolha uma opção:")
+    if(chooseed == "1"):
+        print("Inicializando a simulacao para o exercicio 1, parte 1")
+        print("Inicializando cenario 1")
+        mu1 = 1
+        mu2 = 0
+        simulate(mu1, mu2,lambdas1,0,False,False)
+        print("Inicializando cenario 2")
+        mu1 = 1
+        mu2 = 0.5
+        simulate(mu1, mu2,lambdas2,0.2,False,False)
+        print("Inicializando cenario 3")
+        mu1 = 1/1
+        mu2 = 1/0.5
+        simulate(mu1, mu2,lambdas2,0.2,False,False)
+        print("Inicializando cenario 4")
+        #mu1 = 1
+        #mu2 = 0.5
+        #simulate(mu1, mu2,[0.08],0.2,False,False)
+        print("TODO")
+    if(chooseed == "2"):
+        print("TODO 2")
+        #print("Inicializando a simulacao para o exercicio 1, parte 1")
+        #mu1 = 1
+        #mu2 = 0.5
+        #simulate(mu1, mu2,lambdas1,0,False,False)
+    if(chooseed == "3"):
+        print("TODO 3")
+        #print("Inicializando a simulacao para o exercicio 1, parte 1")
+        #mu1 = 1
+        #mu2 = 0.5
+        #simulate(mu1, mu2,lambdas1,0,False,False)
+    if(chooseed == "4"):
+        print("TODO 4")
+        #print("Inicializando a simulacao para o exercicio 1, parte 1")
+        #mu1 = 1
+        #mu2 = 0
+        #simulate(mu1, mu2,lambdas1,0,False,False)
+        
+    
+    
+    
+
+inicialization()
 
 
 aux.save_generator_state(random_generator)
