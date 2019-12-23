@@ -115,7 +115,7 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simula
     mean_persons_on_system /= simulation_total_rounds
 
     #TODO: AJUSTAR AS METRICAS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    analytic_utilisation = lambd1 / mi
+    analytic_utilisation = (lambd1 + lambd2) / (mi1 + mi2)
     persons_on_system_variance = 0
 
     for i in range(0, len(mean_persons_per_round)):
@@ -133,8 +133,10 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simula
 
     analytic_mean_persons_on_system = aux.little_law(lambd1, mi)
 
-    print("Lambda " + str(lambd1))
-    print("Mi " + str(mi))
+    print("Lambda1: " + str(lambd1))
+    print("Lambda2: " + str(lambd2))
+    print("Mi1: " + str(mi1))
+    print("Mi2: " + str(mi2))
     print("Pessoas Servidas " + str(served_persons))
     print("Pessoas médias analíticas no sistema " + str(analytic_mean_persons_on_system))
     print("Média de pessoas no sistema " + str(mean_persons_on_system))
@@ -285,7 +287,6 @@ def inicialization():
         mu1 = 1
         mu2 = 0.5
         simulate(mu1, mu2,[0.08],0.2,False,False,"unif")
-        print("TODO")
     if(chooseed == "2"):
         print("TODO 2")
         #print("Inicializando a simulacao para o exercicio 1, parte 1")
