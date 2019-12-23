@@ -28,13 +28,17 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simula
     for _ in range(1, simulation_total_rounds):
 
         simulation_time = 0
+        #Essa fila se refere aos eventos que ocorrerao no futuro
         simulation_queue = Queue()
+        #Esta fila se refere aqueles que já chegaram mas ainda não foram processados, eles não podem ser perdidos e tem prioridade de atendimento, visto que já estão na fila.
+        waiting_queue = Queue()
         persons_counter = 0
         served_persons = 0
         last_event_time = 0
         area_under_persons_chart = 0
         service_end_time = simulation_total_time
 
+        #Verifica qual caso entrara primeiro (1 ou 2)
         if client_type(lambd1, lambd2) is 1:
             arrival_time = random_generator.exponential(lambd1)
             simulation_queue.push(Event(TipoEvento.Arrival, arrival_time, 1))
@@ -45,41 +49,58 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simula
 
 
         while simulation_time <= simulation_total_time and (not simulation_queue.is_queue_empty()):
+            #Pega o proximo evento que ira ocorrer (chegada ou saida)
             event = simulation_queue.pop()
-
+                
+            #Caso seja uma chegada
             if event.event_type is TipoEvento.Arrival:
                 simulation_time = arrival_time
                 area_under_persons_chart += persons_counter * (simulation_time - last_event_time)
+                #Aumento o numero de pessoas na fila
                 persons_counter += 1
+                #Pega o tempo do ultimo evento
                 last_event_time = simulation_time
-
+                
+                #Crio o proximo evento de chegada
                 if client_type(lambd1, lambd2) is 1:
                     arrival_time = simulation_time + random_generator.exponential(lambd1)
                     simulation_queue.push(Event(TipoEvento.Arrival, arrival_time, 1))
                 else:
                     arrival_time = simulation_time + random_generator.exponential(lambd2)
                     simulation_queue.push(Event(TipoEvento.Arrival, arrival_time, 2))
-
+                #Verifica se ele é o unico na fila e pode ser servido imediatamente
                 if persons_counter == 1:
                     if event.event_class is 1:
                         service_end_time = simulation_time + random_generator.exponential(mi1)
                     else:
                         service_end_time = simulation_time + random_generator.exponential(mi2)
                     simulation_queue.push( Event(TipoEvento.Departure, service_end_time, event.event_class) )
-
+                #Caso já haja um evento sendo servido ele deve ser mantido em uma fila. Pois ele chegou mas não sera atendido no momento
+                #Precisamos saber de que tipo ele é tambem
+                else:
+                    waiting_queue.push(event)
+                    
+            #Caso seja uma saida
             elif event.event_type is TipoEvento.Departure:
+                
                 simulation_time = service_end_time
                 area_under_persons_chart += persons_counter * (simulation_time - last_event_time)
+                #Diminui o numero de pessoas na fila
                 persons_counter -= 1
+                #Pega o tempo do ultimo evento
                 last_event_time = simulation_time
+                #Aumenta o numero de pessoas que foram servidas
                 served_persons += 1
-
+                #Verifica se há alguem na fila
                 if persons_counter > 0:
-                    if simulation_queue.nextEvent().event_class is 1:
+                    #Pegamos o evento que chegou e esta aguardando e criamos seu evento de saida (Fila)
+                    event = waiting_queue.pop()
+                    if event.event_class is 1:
                         service_end_time = simulation_time + random_generator.exponential(mi1)
                     else:
                         service_end_time = simulation_time + random_generator.exponential(mi2)                    
                     simulation_queue.push(Event(TipoEvento.Departure, service_end_time, event.event_class) )
+                    
 
         mean_persons_per_round.append(area_under_persons_chart / simulation_total_time)
 
