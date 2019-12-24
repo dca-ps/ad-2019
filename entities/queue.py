@@ -21,7 +21,7 @@ class Queue:
     #Push com organização por prioridade.
     def push_queue(self, element):
         self.array.append(element)
-        self.array = sorted(self.array, key = lambda e : (e.event_class, e.event_start_time,), reverse = True)
+        self.array = sorted(self.array, key = lambda e : (e.event_type, e.event_start_time,), reverse = True)
         #print("Fila de pessoas aguardando ")
         #print(*self.array)
         #print('\n*********************************************************\n')

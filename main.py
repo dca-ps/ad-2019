@@ -2,23 +2,15 @@ import numpy
 import auxiliar.functions as aux
 from entities.queue import Queue
 from entities.event import Event
-from enums.tipo_evento import TipoEvento
+from enums.event_type import EventType
+from enums.client_type import ClientType
 import random 
 
 
 
-# recuperando a ultima semente utilizada pelo gerador de numeros aleatorios (se existir)
+# Recuperando a ultima semente utilizada pelo gerador de numeros aleatorios (se existir)
 random_generator = aux.create_random_generator()
 
-
-def client_type(lambda1, lambda2):
-    n = lambda1 + lambda2
-    prob1 = lambda1/n
-    x = random.random()
-    if(x<=prob1):
-        return 1
-    else:
-        return 2
 
 def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simulation_total_time, priority, preempcao, departure_type):
 
@@ -28,9 +20,10 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simula
     for _ in range(1, simulation_total_rounds):
 
         simulation_time = 0
-        #Essa fila se refere aos eventos que ocorrerao no futuro
+        # Essa fila se refere aos eventos que ocorrerao no futuro
         simulation_queue = Queue()
-        #Esta fila se refere aqueles que já chegaram mas ainda não foram processados, eles não podem ser perdidos e tem prioridade de atendimento, visto que já estão na fila.
+        # Esta fila se refere aqueles que já chegaram mas ainda não foram processados,
+        # eles não podem ser perdidos e tem prioridade de atendimento, visto que já estão na fila.
         waiting_queue = Queue()
         persons_counter = 0
         served_persons = 0
@@ -38,54 +31,53 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simula
         area_under_persons_chart = 0
         service_end_time = simulation_total_time
 
-        #Verifica qual caso entrara primeiro (1 ou 2)
-        if client_type(lambd1, lambd2) is 1:
+        # Verifica qual caso entrara primeiro (cliente 1 ou 2)
+        if aux.client_type(lambd1, lambd2) == 1:
             arrival_time = random_generator.exponential(lambd1)
-            simulation_queue.push(Event(TipoEvento.Arrival, arrival_time, 1))
+            simulation_queue.push(Event(EventType.Arrival, arrival_time, ClientType.One))
         else:
             arrival_time = random_generator.exponential(lambd2)
-            simulation_queue.push(Event(TipoEvento.Arrival, arrival_time, 2))
-        
-
+            simulation_queue.push(Event(EventType.Arrival, arrival_time, ClientType.Two))
 
         while simulation_time <= simulation_total_time and (not simulation_queue.is_queue_empty()):
-            #Pega o proximo evento que ira ocorrer (chegada ou saida)
+            # Pega o proximo evento que ira ocorrer (chegada ou saida)
             event = simulation_queue.pop()
                 
-            #Caso seja uma chegada
-            if event.event_type is TipoEvento.Arrival:
+            # Caso seja uma chegada
+            if event.event_type is EventType.Arrival:
                 simulation_time = arrival_time
                 area_under_persons_chart += persons_counter * (simulation_time - last_event_time)
-                #Aumento o numero de pessoas na fila
+                # Aumento o numero de pessoas na fila
                 persons_counter += 1
-                #Pega o tempo do ultimo evento
+                # Pega o tempo do ultimo evento
                 last_event_time = simulation_time
                 
-                #Crio o proximo evento de chegada
-                if client_type(lambd1, lambd2) is 1:
+                # Cria o proximo evento de chegada
+                if aux.client_type(lambd1, lambd2) == ClientType.One:
                     arrival_time = simulation_time + random_generator.exponential(lambd1)
-                    simulation_queue.push(Event(TipoEvento.Arrival, arrival_time, 1))
+                    simulation_queue.push(Event(EventType.Arrival, arrival_time, ClientType.One))
                 else:
                     arrival_time = simulation_time + random_generator.exponential(lambd2)
-                    simulation_queue.push(Event(TipoEvento.Arrival, arrival_time, 2))
-                #Verifica se ele é o unico na fila e pode ser servido imediatamente
+                    simulation_queue.push(Event(EventType.Arrival, arrival_time, ClientType.Two))
+
+                # Verifica se ele é o unico na fila e pode ser servido imediatamente
                 if persons_counter == 1:
-                    if event.event_class is 1:
+                    if event.client_type == ClientType.One:
                         service_end_time = exit_time_calculation(event, mi1, simulation_time, departure_type)
                     else:
                         service_end_time = exit_time_calculation(event, mi2, simulation_time, departure_type)
-                    simulation_queue.push( Event(TipoEvento.Departure, service_end_time, event.event_class) )
-                #Caso já haja um evento sendo servido ele deve ser mantido em uma fila. Pois ele chegou mas não sera atendido no momento
-                #Precisamos saber de que tipo ele é tambem
+                    simulation_queue.push(Event(EventType.Departure, service_end_time, event.client_type))
+                # Caso já haja um evento sendo servido ele deve ser mantido em uma fila. Pois ele chegou mas não sera atendido no momento
+                # Precisamos saber de que tipo ele é tambem
                 else:
-                    #Este push tem que ordenar por prioridade de atendimento, pois estamos falando da fila de atendimento.
+                    # Este push tem que ordenar por prioridade de atendimento, pois estamos falando da fila de atendimento.
                     #**********************************************************************
-                    #IMPORTANTE: Caso não haja prioridade, basta trocar por um push normal! (Implementado!)
+                    # IMPORTANTE: Caso não haja prioridade, basta trocar por um push normal! (Implementado!)
                     #**********************************************************************
                     waiting_queue.push_queue(event) if priority is True else waiting_queue.push(event)
                     
             #Caso seja uma saida
-            elif event.event_type is TipoEvento.Departure:
+            elif event.event_type is EventType.Departure:
                 
                 simulation_time = service_end_time
                 area_under_persons_chart += persons_counter * (simulation_time - last_event_time)
@@ -100,11 +92,11 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simula
                     #Pegamos o evento que chegou e esta aguardando e criamos seu evento de saida (Fila)
                     #Esta fila já esta ordenada para prioridade, se houver
                     event = waiting_queue.pop()
-                    if event.event_class is 1:
+                    if event.client_type == 1:
                         service_end_time = exit_time_calculation(event, mi1, simulation_time, departure_type)
                     else:
                         service_end_time = exit_time_calculation(event, mi2, simulation_time, departure_type)                    
-                    simulation_queue.push(Event(TipoEvento.Departure, service_end_time, event.event_class) )
+                    simulation_queue.push(Event(EventType.Departure, service_end_time, event.client_type))
                     
 
         mean_persons_per_round.append(area_under_persons_chart / simulation_total_time)
@@ -144,6 +136,8 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simula
     print("Utilização analítica " + str(analytic_utilisation))
     print("Pessoas no desvio padrão do sistema " + str(persons_on_system_standard_deviation) + "\n")
 
+    return mean_persons_on_system
+
 
 
 
@@ -178,7 +172,7 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simula
 #
 #                if persons_counter == 1:
 #                    service_end_time = simulation_time + random_generator.exponential(mi)
-#                    simulation_queue.push( Event(TipoEvento.Departure, service_end_time, event.event_class) )
+#                    simulation_queue.push( Event(TipoEvento.Departure, service_end_time, event.client_type) )
 #
 #            elif event.event_type is TipoEvento.Departure:
 #                simulation_time = service_end_time
@@ -189,7 +183,7 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simula
 #
 #                if persons_counter > 0:
 #                    service_end_time = simulation_time + random_generator.exponential(mi)
-#                    simulation_queue.push(Event(TipoEvento.Departure, service_end_time, event.event_class) )
+#                    simulation_queue.push(Event(TipoEvento.Departure, service_end_time, event.client_type) )
 #
 #        mean_persons_per_round.append(area_under_persons_chart / simulation_total_time)
 #
@@ -231,7 +225,7 @@ def exit_time_calculation(event, mi, simulation_time, type):
     if(type == "exp"):
         return simulation_time + random_generator.exponential(mi)
     if(type == "unif"):
-        return simulation_time + random.uniform(5,15) if event.event_class is 1 else simulation_time + random.uniform(1,3)
+        return simulation_time + random.uniform(5,15) if event.client_type == 1 else simulation_time + random.uniform(1,3)
     if(type == "med"):
         return simulation_time + 1/mi
 
@@ -242,9 +236,13 @@ mi = 1
 n_rodadas = 10
 total_time = 10000
 
-def simulate(mu1, mu2, lambdas1, lambda2, priority, preempecao, departure_type):
-    for lambd in lambdas1:
-        run_queue_parallel(lambd, lambda2, mu1, mu2, n_rodadas, total_time, priority, preempecao, departure_type)
+def simulate(chosen_scenario, mu1, mu2, lambdas1, lambda2, priority, preempcao, departure_type):
+    results = []
+    for lambda1 in lambdas1:
+        mean_persons_on_system = \
+            run_queue_parallel(lambda1, lambda2, mu1, mu2, n_rodadas, total_time, priority, preempcao, departure_type)
+        results.append((lambda1, mean_persons_on_system))
+    aux.plot(chosen_scenario, results, lambda2)
 
 
 def inicialization():
@@ -261,94 +259,117 @@ def inicialization():
     print("               GABRIEL BARBOSA\n")
     print("************************************************\n")
     print("Escolha o cenario de simulacao:\n")
-    print("1-Exercicio 3 parte 1\n")
-    print("2-Exercicio 3 parte 2 (Mudanca no grafico gerado)\n")
-    print("3-Exercicio 4 parte 1 Prioridade sem preempção\n")
-    print("4-Exercicio 4 parte 2 Prioridade sem preempção (Mudanca no grafico gerado)\n")
+    print("1 - Exercicio 3 parte 1\n")
+    print("2 - Exercicio 3 parte 2 (Mudanca no grafico gerado)\n")
+    print("3 - Exercicio 4 parte 1 Prioridade sem preempção\n")
+    print("4 - Exercicio 4 parte 2 Prioridade sem preempção (Mudanca no grafico gerado)\n")
+    print("t - Todos os anteriores\n")
     print("Restante do trabalho em desenvolvimento")
     print("***********************************************\n")
-    chooseed = input("Escolha uma opção:")
-    if(chooseed == "1"):
+
+    all = 't'
+    chosen_scenario = input("Escolha uma opção: ")
+    if (chosen_scenario == "1" or chosen_scenario == 't'):
         print("Inicializando a simulacao para o exercicio 3, parte 1")
+        c = 1
+
         print("Inicializando cenario 1")
         mu1 = 1
         mu2 = 0
-        simulate(mu1, mu2,lambdas1,0,False,False, "exp")
+        simulate(str(c) + '.'  + str('1'), mu1, mu2, lambdas1, 0, False, False, "exp")
+
         print("Inicializando cenario 2")
         mu1 = 1
         mu2 = 0.5
-        simulate(mu1, mu2,lambdas2,0.2,False,False, "exp")
+        simulate(str(c) + '.'  + str('2'), mu1, mu2,lambdas2, 0.2, False, False, "exp")
+
         print("Inicializando cenario 3")
         mu1 = 1
         mu2 = 0.5
-        simulate(mu1, mu2,lambdas3,0.2,False,False, "med")
+        simulate(str(c) + '.'  + str('3'), mu1, mu2, lambdas3, 0.2, False, False, "med")
+
         print("Inicializando cenario 4")
         #TODO: CORRIGIR AS METRICAS DESTE CENARIO
         mu1 = 1
         mu2 = 0.5
-        simulate(mu1, mu2,[0.08],0.2,False,False,"unif")
-    if(chooseed == "2"):
+        simulate(str(c) + '.'  + str('4'), mu1, mu2, [0.08], 0.2, False, False, "unif")
+
+    if (chosen_scenario == "2" or chosen_scenario == 't'):
         #TODO:Mudar a exibição dos gráficos!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         print("Inicializando a simulacao para o exercicio 3, parte 2")
         print("Neste caso há uma mudança no grafico gerado em comparação com a opção 1")
+        c = 2
+
         print("Inicializando cenario 1")
         mu1 = 1
         mu2 = 0
-        simulate(mu1, mu2,lambdas1,0,False,False, "exp")
+        simulate(str(c) + '.'  + str('1'), mu1, mu2,lambdas1,0,False,False, "exp")
+
         print("Inicializando cenario 2")
         mu1 = 1
         mu2 = 0.5
-        simulate(mu1, mu2,lambdas2,0.2,False,False, "exp")
+        simulate(str(c) + '.'  + str('2'), mu1, mu2,lambdas2,0.2,False,False, "exp")
+
         print("Inicializando cenario 3")
         mu1 = 1
         mu2 = 0.5
-        simulate(mu1, mu2,lambdas3,0.2,False,False, "med")
+        simulate(str(c) + '.'  + str('3'), mu1, mu2,lambdas3,0.2,False,False, "med")
+
         print("Inicializando cenario 4")
         #TODO: CORRIGIR AS METRICAS DESTE CENARIO
         mu1 = 1
         mu2 = 0.5
-        simulate(mu1, mu2,[0.08],0.2,False,False,"unif")
-    if(chooseed == "3"):
+        simulate(str(c) + '.'  + str('4'), mu1, mu2,[0.08],0.2,False,False,"unif")
+
+    if (chosen_scenario == "3" or chosen_scenario == 't'):
         print("Inicializando a simulacao para o exercicio 4, parte 1")
+        c = 3
+
         print("Inicializando cenario 1")
         mu1 = 1
         mu2 = 0
-        simulate(mu1, mu2,lambdas1,0,False,False, "exp")
+        simulate(str(c) + '.'  + str('1'), mu1, mu2,lambdas1,0,False,False, "exp")
+
         print("Inicializando cenario 2")
         mu1 = 1
         mu2 = 0.5
-        simulate(mu1, mu2,lambdas2,0.2,True,False, "exp")
+        simulate(str(c) + '.'  + str('2'), mu1, mu2,lambdas2,0.2,True,False, "exp")
+
         print("Inicializando cenario 3")
         mu1 = 1
         mu2 = 0.5
-        simulate(mu1, mu2,lambdas3,0.2,True,False, "med")
+        simulate(str(c) + '.'  + str('3'), mu1, mu2,lambdas3,0.2,True,False, "med")
+
         print("Inicializando cenario 4")
         #TODO: CORRIGIR AS METRICAS DESTE CENARIO
         mu1 = 1
         mu2 = 0.5
-        simulate(mu1, mu2,[0.08],0.2,True,False,"unif")
-    if(chooseed == "4"):
+        simulate(str(c) + '.'  + str('4'), mu1, mu2,[0.08],0.2,True,False,"unif")
+
+    if(chosen_scenario == "4" or chosen_scenario == 't'):
         print("Inicializando a simulacao para o exercicio 4, parte 2")
+        c = 4
+
         print("Inicializando cenario 1")
         mu1 = 1
         mu2 = 0
-        simulate(mu1, mu2,lambdas1,0,False,False, "exp")
+        simulate(str(c) + '.'  + str('1'), mu1, mu2,lambdas1,0,False,False, "exp")
+
         print("Inicializando cenario 2")
         mu1 = 1
         mu2 = 0.5
-        simulate(mu1, mu2,lambdas2,0.2,True,False, "exp")
+        simulate(str(c) + '.'  + str('2'), mu1, mu2,lambdas2,0.2,True,False, "exp")
+
         print("Inicializando cenario 3")
         mu1 = 1
         mu2 = 0.5
-        simulate(mu1, mu2,lambdas3,0.2,True,False, "med")
+        simulate(str(c) + '.'  + str('3'), mu1, mu2,lambdas3,0.2,True,False, "med")
+
         print("Inicializando cenario 4")
         #TODO: CORRIGIR AS METRICAS DESTE CENARIO
         mu1 = 1
         mu2 = 0.5
-        simulate(mu1, mu2,[0.08],0.2,True,False,"unif")
-        
-    
-    
+        simulate(str(c) + '.'  + str('4'), mu1, mu2,[0.08],0.2,True,False,"unif")
     
 
 inicialization()

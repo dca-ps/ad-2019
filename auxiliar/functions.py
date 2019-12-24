@@ -1,5 +1,7 @@
 import numpy, random
+import matplotlib.pyplot as plt
 from entities.interval import Interval
+from enums.client_type import ClientType
 
 SEED_FILENAME = 'seed'
 
@@ -33,3 +35,26 @@ def save_generator_state(generator):
     final_state = generator.getstate()
     file = open(SEED_FILENAME, 'w')
     file.write(str(final_state))
+
+def client_type(lambda1, lambda2):
+    n = lambda1 + lambda2
+    prob1 = lambda1/n
+    x = random.random()
+    if(x<=prob1):
+        return ClientType.One
+    else:
+        return ClientType.Two
+
+def plot(chosen_scenario, results, lambda2):
+    plt.xlabel('Taxa média de chegada (classe 1 / s)')
+    plt.ylabel('Tempo médio no sistema (s)')
+    plt.title('Taxa chegada classe 2: '+ str(lambda2))
+    try:
+        x, y = zip(*results)
+        plt.plot(x, y)
+        # plt.show()
+        plt.savefig('charts/cenario' + str(chosen_scenario) + '_lambda2_'  + str(round(lambda2, 2)) + '.png')
+    except:
+        print('Dados insuficientes')
+    plt.close('all')
+
