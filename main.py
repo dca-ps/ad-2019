@@ -131,7 +131,7 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds, simula
             len(mean_persons_per_round)
         )
 
-    analytic_mean_persons_on_system = aux.little_law(lambd1, mi)
+    analytic_mean_persons_on_system = aux.little_law(lambd1, lambd2, mi1, mi2)
 
     print("Lambda1: " + str(lambd1))
     print("Lambda2: " + str(lambd2))

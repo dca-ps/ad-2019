@@ -3,8 +3,8 @@ from entities.interval import Interval
 
 SEED_FILENAME = 'seed'
 
-def little_law(lambd, mi):
-    rho = lambd / mi
+def little_law(lambd1, lambd2, mi1, mi2):
+    rho = (lambd1 + lambd2) / (mi1 + mi2)
     return rho / (1 - rho)
 
 def confidence_interval(standard_deviation, sample_mean, sample_size):
