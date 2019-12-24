@@ -141,7 +141,7 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds,
     print("Utilização analítica " + str(analytic_utilisation))
     print("Pessoas no desvio padrão do sistema " + str(persons_on_system_standard_deviation) + "\n")
 
-    return mean_persons_on_system
+    return (mean_persons_on_system, confidence_interval_end_points)
 
 
 lambdas_question_1 = (round(n, 2) for n in numpy.arange(.05, .91, .05)) # 0.05, 0.1, 0.15, . . . , 0.9
@@ -155,9 +155,9 @@ total_time = 10000
 def simulate(chosen_scenario, mu1, mu2, lambdas1, lambda2, priority, preempcao, distribution_type):
     results = []
     for lambda1 in lambdas1:
-        mean_persons_on_system = \
+        mean_persons_on_system, confidence_interval = \
             run_queue_parallel(lambda1, lambda2, mu1, mu2, n_rodadas, total_time, priority, preempcao, distribution_type)
-        results.append((lambda1, mean_persons_on_system))
+        results.append((lambda1, mean_persons_on_system, confidence_interval))
     aux.plot(chosen_scenario, results, lambda2)
 
 

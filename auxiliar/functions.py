@@ -12,7 +12,7 @@ def little_law(lambd1, lambd2, mi1, mi2):
 
 def confidence_interval(standard_deviation, sample_mean, sample_size):
     interval = 1.96 * (standard_deviation / numpy.sqrt(sample_size))
-    return Interval(sample_mean - interval, sample_mean + interval)
+    return (sample_mean - interval, sample_mean + interval)
 
 def create_random_generator():
     # recuperando a ultima semente utilizada pelo gerador de numeros aleatorios (se existir)
@@ -62,11 +62,16 @@ def plot(chosen_scenario, results, lambda2):
     plt.ylabel('Tempo médio no sistema (s)')
     plt.title('Taxa chegada classe 2: '+ str(lambda2))
     try:
-        x, y = zip(*results)
+        x, y, errors = zip(*results)
         plt.plot(x, y)
+        errors_lists = [list(e) for e in zip(*errors)]
+        lolims = errors_lists[0]
+        uplims = errors_lists[1]
+        plt.errorbar(x, y, lolims=lolims, uplims=uplims, marker='|', markersize=8,
+            linestyle='none')
         # plt.show()
         plt.savefig('charts/cenario' + str(chosen_scenario) + '_lambda2_'  + str(round(lambda2, 2)) + '.png')
-    except:
-        print('Dados insuficientes')
+    except Exception as e:
+        print('Dados insuficientes:\t' + str(e))
     plt.close('all')
 
