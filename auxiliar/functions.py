@@ -2,6 +2,7 @@ import numpy, random
 import matplotlib.pyplot as plt
 from entities.interval import Interval
 from enums.client_type import ClientType
+from enums.distribution_type import DistributionType
 
 SEED_FILENAME = 'seed'
 
@@ -36,7 +37,7 @@ def save_generator_state(generator):
     file = open(SEED_FILENAME, 'w')
     file.write(str(final_state))
 
-def client_type(lambda1, lambda2):
+def next_client_type(lambda1, lambda2):
     n = lambda1 + lambda2
     prob1 = lambda1/n
     x = random.random()
@@ -44,6 +45,17 @@ def client_type(lambda1, lambda2):
         return ClientType.One
     else:
         return ClientType.Two
+
+#Função para calcular o instante de saida.
+def exit_time_calculation(event, mi, simulation_time, distribution_type, random_generator):
+    if distribution_type == DistributionType.exp :
+        return simulation_time + random_generator.exponential(mi)
+    if distribution_type == DistributionType.med:
+        return simulation_time + 1/mi
+    if distribution_type == DistributionType.unif:
+        return simulation_time + random.uniform(5,15) if \
+            event.client_type == ClientType.One else simulation_time + random.uniform(1,3)
+
 
 def plot(chosen_scenario, results, lambda2):
     plt.xlabel('Taxa média de chegada (classe 1 / s)')
