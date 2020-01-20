@@ -58,20 +58,27 @@ def exit_time_calculation(event, mi, simulation_time, distribution_type, random_
 
 
 def plot(chosen_scenario, results, lambda2):
-    plt.xlabel('Taxa média de chegada (classe 1 / s)')
+    plt.xlabel('Taxa média de chegada classe 1 [cliente/s]')
     plt.ylabel('Tempo médio no sistema (s)')
-    plt.title('Taxa chegada classe 2: '+ str(lambda2))
+    plt.title('Taxa chegada classe 2: '+ str(lambda2) + str(' [cliente/s]'))
     try:
         x, y, errors = zip(*results)
-        plt.plot(x, y)
-        errors_lists = [list(e) for e in zip(*errors)]
-        lolims = errors_lists[0]
-        uplims = errors_lists[1]
-        plt.errorbar(x, y, lolims=lolims, uplims=uplims, marker='|', markersize=8,
-            linestyle='none')
+        # plt.plot(x, y)
+        error_lists = [list(e) for e in zip(*errors)]
+        (yerror_bellow, yerror_above) = __interval_in_confidence_points(y, error_lists)
+        # plt.errorbar(x, y, lolims=lolims, uplims=uplims, marker='|', markersize=8, linestyle='none')
+        plt.errorbar(x, y, yerr=[yerror_bellow, yerror_above], fmt=':o', markersize=3)
         # plt.show()
-        plt.savefig('charts/cenario' + str(chosen_scenario) + '_lambda2_'  + str(round(lambda2, 2)) + '.png')
+        plt.savefig('charts/cenario' + str(chosen_scenario) + '_lambda_'  + str(round(lambda2, 2)) + '.png')
     except Exception as e:
         print('Dados insuficientes:\t' + str(e))
     plt.close('all')
+
+def __interval_in_confidence_points(y_values, error_lists):
+    yerror_bellow = []
+    yerror_above = []
+    for y, error_bellow, error_above in zip(y_values, error_lists[0], error_lists[1]):
+        yerror_bellow.append(y - error_bellow)
+        yerror_above.append(error_above - y)
+    return (yerror_bellow, yerror_above)
 

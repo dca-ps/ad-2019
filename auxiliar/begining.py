@@ -31,7 +31,7 @@ def call_simulation(simulate, scenario, lambdas):
         print('Inicializando caso ' + str(case))
 
     if (scenario == '1' or scenario == all):
-        print('Inicializando a simulacao para o exercicio 3, parte 1')
+        print('\nInicializando a simulacao para o exercicio 3, parte 1')
         scene = '1'
 
         case = 1
@@ -61,7 +61,7 @@ def call_simulation(simulate, scenario, lambdas):
 
     if (scenario == '2' or scenario == all):
         # TODO:Mudar a exibição dos gráficos!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        print('Inicializando a simulacao para o exercicio 3, parte 2')
+        print('\nInicializando a simulacao para o exercicio 3, parte 2')
         print('Neste caso há uma mudança no grafico gerado em comparação com a opção 1')
         scene = '2'
 
@@ -91,7 +91,7 @@ def call_simulation(simulate, scenario, lambdas):
         simulate(scene + '.' + str(case), mu1, mu2, [0.08], 0.2, False, False, DistributionType.unif)
 
     if (scenario == '3' or scenario == all):
-        print('Inicializando a simulacao para o exercicio 4, parte 1')
+        print('\nInicializando a simulacao para o exercicio 4, parte 1')
         scene = '3'
 
         case = 1
@@ -120,7 +120,7 @@ def call_simulation(simulate, scenario, lambdas):
         simulate(scene + '.' + str(case), mu1, mu2, [0.08], 0.2, True, False, DistributionType.unif)
 
     if (scenario == '4' or scenario == all):
-        print('Inicializando a simulacao para o exercicio 4, parte 2')
+        print('\nInicializando a simulacao para o exercicio 4, parte 2')
         scene = '4'
 
         case = 1
