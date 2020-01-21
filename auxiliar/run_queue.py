@@ -125,15 +125,15 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds,
 
     analytic_mean_persons_on_system = aux.little_law(lambd1, lambd2, mi1, mi2)
 
-    print("Lambda1: " + str(lambd1))
-    print("Lambda2: " + str(lambd2))
-    print("Mi1: " + str(mi1))
-    print("Mi2: " + str(mi2))
-    print("Pessoas Servidas: " + str(served_persons))
-    print("Pessoas médias analíticas no sistema: " + str(analytic_mean_persons_on_system))
-    print("Média de pessoas no sistema: " + str(mean_persons_on_system))
+    print("Lambda clientes 1: " + str(lambd1))
+    print("Mi 1: " + str(mi1))
+    print("Lambda clientes 2: " + str(lambd2))
+    print("Mi 2: " + str(mi2))
+    print("# pessoas Servidas: " + str(served_persons))
+    print("# médio de pessoas: " + str(mean_persons_on_system))
+    print("# médio de pessoas (analítico): " + str(analytic_mean_persons_on_system))
     print("Intervalo de confiança: " + str(confidence_interval_end_points))
-    print("Utilização analítica: " + str(analytic_utilisation))
+    print("Utilização (analítico): " + str(analytic_utilisation))
     print("Pessoas no desvio padrão do sistema: " + str(persons_on_system_standard_deviation) + "\n")
 
     return (mean_persons_on_system, confidence_interval_end_points)
