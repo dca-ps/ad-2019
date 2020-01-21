@@ -63,10 +63,8 @@ def plot(chosen_scenario, results, lambda2):
     plt.title('Taxa chegada classe 2: '+ str(lambda2) + str(' [cliente/s]'))
     try:
         x, y, errors = zip(*results)
-        # plt.plot(x, y)
         error_lists = [list(e) for e in zip(*errors)]
         (yerror_bellow, yerror_above) = __interval_in_confidence_points(y, error_lists)
-        # plt.errorbar(x, y, lolims=lolims, uplims=uplims, marker='|', markersize=8, linestyle='none')
         plt.errorbar(x, y, yerr=[yerror_bellow, yerror_above], fmt=':o', markersize=3)
         # plt.show()
         plt.savefig('charts/cenario' + str(chosen_scenario) + '_lambda_'  + str(round(lambda2, 2)) + '.png')
