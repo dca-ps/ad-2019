@@ -19,10 +19,10 @@ total_time = 10000
 def simulate(chosen_scenario, mu1, mu2, lambdas1, lambda2, priority, preempcao, distribution_type):
     results = []
     for lambda1 in lambdas1:
-        mean_persons_on_system, confidence_interval = \
+        mean_persons_on_system, confidence_interval, analytic_mean_persons_on_system = \
             run_queue.run_queue_parallel(lambda1, lambda2, mu1, mu2, n_rodadas,
                                          total_time, priority, preempcao, distribution_type, random_generator)
-        results.append((lambda1, mean_persons_on_system, confidence_interval))
+        results.append((lambda1, mean_persons_on_system, confidence_interval, analytic_mean_persons_on_system))
     aux.plot(chosen_scenario, results, lambda2)
 
 def init():

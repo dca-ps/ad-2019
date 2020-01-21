@@ -1,5 +1,6 @@
 import numpy, random
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 from entities.interval import Interval
 from enums.client_type import ClientType
 from enums.distribution_type import DistributionType
@@ -61,15 +62,22 @@ def plot(chosen_scenario, results, lambda2):
     plt.xlabel('Taxa média de chegada classe 1 [cliente/s]')
     plt.ylabel('Tempo médio no sistema (s)')
     plt.title('Taxa chegada classe 2: '+ str(lambda2) + str(' [cliente/s]'))
+    markersize = 3
+    blue_label = mpatches.Patch(color='blue', label='Simulação')
+    red_label = mpatches.Patch(color='red', label='Resultado analítico')
     try:
-        x, y, errors = zip(*results)
+        x, y, errors, analytical_result = zip(*results)
         error_lists = [list(e) for e in zip(*errors)]
         (yerror_bellow, yerror_above) = __interval_in_confidence_points(y, error_lists)
-        plt.errorbar(x, y, yerr=[yerror_bellow, yerror_above], fmt=':o', markersize=3)
+        plt.errorbar(x, y, yerr=[yerror_bellow, yerror_above], fmt=':o',
+                     label='Simulacao', markersize=markersize)
+        plt.plot(x, analytical_result, ':rd', markersize=markersize)
+        plt.legend(handles=[blue_label, red_label])
+        plt.plot()
         # plt.show()
         plt.savefig('charts/cenario' + str(chosen_scenario) + '_lambda_'  + str(round(lambda2, 2)) + '.png')
     except Exception as e:
-        print('Dados insuficientes:\t' + str(e))
+        print('Erro na geracao do grafico:\t' + str(e))
     plt.close('all')
 
 def __interval_in_confidence_points(y_values, error_lists):

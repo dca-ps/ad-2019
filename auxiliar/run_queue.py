@@ -130,10 +130,10 @@ def run_queue_parallel(lambd1, lambd2, mi1, mi2, simulation_total_rounds,
     print("Lambda clientes 2: " + str(lambd2))
     print("Mi 2: " + str(mi2))
     print("# pessoas Servidas: " + str(served_persons))
-    print("# médio de pessoas: " + str(mean_persons_on_system))
     print("# médio de pessoas (analítico): " + str(analytic_mean_persons_on_system))
+    print("# médio de pessoas: " + str(mean_persons_on_system))
     print("Intervalo de confiança: " + str(confidence_interval_end_points))
     print("Utilização (analítico): " + str(analytic_utilisation))
     print("Pessoas no desvio padrão do sistema: " + str(persons_on_system_standard_deviation) + "\n")
 
-    return (mean_persons_on_system, confidence_interval_end_points)
+    return (mean_persons_on_system, confidence_interval_end_points, analytic_mean_persons_on_system)
